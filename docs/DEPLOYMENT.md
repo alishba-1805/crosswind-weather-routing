@@ -1,6 +1,7 @@
 # Free deployment preparation
 
-No deployment or GitHub push has been performed. Do not add a card or select a
+Source is published at https://github.com/alishba-1805/crosswind-weather-routing
+on main. No deployment has been performed. Do not add a card or select a
 paid tier. Provider account requirements may change; stop if a signup requires
 payment. No database, background worker or paid resource is required.
 
@@ -32,3 +33,26 @@ public production use. Do not silently switch to a paid plan.
 The process-local quota limiter resets on restart and is not a global upstream
 quota guarantee. Review actual HeiGIT dashboard limits before exposing traffic.
 Use the free service's platform logs without logging request authorization headers.
+
+
+## Independent Render frontend handoff
+
+Connect Alishba's GitHub account and select only `alishba-1805/crosswind-weather-routing`,
+branch `main`. Create a new Static Site named `crosswind-web`, root `frontend`,
+build `npm ci && npm run build`, publish directory `dist`. There is no start command.
+Set `NODE_VERSION=24` and `VITE_API_URL=https://<actual-backend-host>` with no trailing slash.
+Do not put provider credentials in frontend variables.
+
+For the backend Web Service use the existing root/build/start settings above,
+Free plan, and `PYTHON_VERSION=3.13.17`. Generate a unique DJANGO_SECRET_KEY and
+set an independent ORS_API_KEY. Set DEBUG=false, ALLOWED_HOSTS to the exact
+backend hostname (no scheme), and CORS_ORIGINS to the exact frontend HTTPS
+origin (no trailing slash). Use the actual assigned hostnames rather than
+assuming the requested service names will be available. After changing the
+frontend API URL, rebuild the static site. Verify /api/health, exact CORS and
+live-provider acceptance. Neither service requires a database.
+
+[Render static-site setup](https://render.com/docs/static-sites) and
+[Vite build settings](https://render.com/tutorials/web-service-vs-static-site/static-sites)
+confirm the static-site deployment model. Do not create services until deployment
+is explicitly authorized; stop if payment information is required.

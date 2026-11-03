@@ -21,11 +21,12 @@ Codex development tools. No other student's project was accessed or reused.
 - Bounded corridor weather circles, cached 0–48h slider and explicit Unknown data.
 - Responsive planning panel, map and comparison; keyboard location selection.
 
-**Status:** local implementation, not yet production accepted. There is no ORS
-key in this checkout. Live HGV/geocoding acceptance and a corridor with three
+**Status:** published source, not yet production accepted. Credentials stay in
+ignored server-side environment files. Live HGV/geocoding acceptance and a corridor with three
 distinct alternatives remain unverified. Browser test routes are synthetic and
 clearly labeled; the application never silently substitutes fixtures for live data.
-No hosted app, GitHub remote or Loom recording has been created.
+Source: [alishba-1805/crosswind-weather-routing](https://github.com/alishba-1805/crosswind-weather-routing).
+No hosted app or Loom recording has been created.
 
 ## Run locally (PowerShell)
 
