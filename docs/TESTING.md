@@ -1,5 +1,25 @@
 # Verification record
 
+## Production addendum — 2026-11-04
+
+- Live Playwright audit of https://crosswind-web.onrender.com against
+  https://crosswind-routing-api.onrender.com: health 200, CORS limited to the
+  frontend origin, autocomplete, three real HGV routes (Frederick to Gaithersburg:
+  24.9/24.2/24.5 mi, 100% weather coverage), checkpoint ETAs using the hour
+  ceiling, 0/24/48 h slider, no overflow at 1280 and 390 px, no uncaught errors,
+  no failed API calls, no secrets in the bundle. Weather observed live was Low.
+- Backend: 36 passed (run during that audit; not re-run for the UX change).
+- UX change after the audit (inline field validation, favicon): Vitest 5 passed
+  (new test for accessible inline errors), ESLint, Prettier check and production
+  build passed. Playwright e2e: 8 passed after the UI copy cleanup (first run timed out on a cold dev server; rerun against a warm one passed), and the screenshots in docs were regenerated.
+- `docs/npm-audit.json` is a point-in-time `npm audit --json` record (0
+  vulnerabilities, 334 dependencies); it was not re-generated.
+- The MapLibre `circle-11` warning comes from the OpenFreeMap dark style layer;
+  the app defines no icon-image. Rendering is unaffected; left unchanged.
+- Not verified: 25/50 mi sampling on a >50 mi route; live Severe/No Travel.
+
+Earlier local record (2026-11-03) follows.
+
 Local verification on 2026-11-03, Windows, standard CPython 3.13 and Node 24.
 No deterministic test sends routing or weather requests.
 
@@ -16,7 +36,7 @@ No deterministic test sends routing or weather requests.
 | Axe | populated views checked at all four sizes; not a complete accessibility certification |
 | Dependency audits | npm reports zero vulnerabilities after MapLibre upgrade and minimatch override; pip-audit reports no known production dependency vulnerabilities |
 | Live Open-Meteo | one actual request succeeded, confirming mph/inch response units |
-| Live ORS HGV / Pelias | blocked: backend/.env and ORS_API_KEY absent |
+| Live ORS HGV / Pelias | superseded: verified on production 2026-11-04, see addendum |
 
 Browser tests use explicitly labeled invented route/forecast data and live
 OpenFreeMap tiles. They exercise the form, real WebGL map, bounds button,

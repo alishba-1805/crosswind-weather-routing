@@ -1,8 +1,5 @@
 # Crosswind architecture
 
-Independent implementation owned by Alishba Inam; developed with Codex tooling.
-No other project files or history are inputs.
-
 `backend/crosswind/domain.py` holds deterministic sampling, hazards, exposure and
 ranking. `providers.py` owns HTTP, units, timeouts and process-local TTL caching.
 `service.py` orchestrates one routing request and one batched weather request.

@@ -1,6 +1,21 @@
+# Delivery audit
+
+## Production addendum — 2026-11-04
+
+Deployed at https://crosswind-web.onrender.com (frontend) and
+https://crosswind-routing-api.onrender.com (backend). A live Playwright audit found
+no application failures: health 200, exact CORS, real autocomplete, real ORS HGV
+and Open-Meteo data, map, checkpoint ETAs, 0/24/48 h slider, desktop/390 px layout,
+no secrets in the bundle. Frederick, MD to Gaithersburg, MD: three routes of 24.9,
+24.2 and 24.5 mi, 100% weather coverage. Backend: 36 passed. Open: Loom pending;
+25/50 mi sampling on a >50 mi route unverified; live Severe/No Travel weather not
+observed (test-only); rain/snow endpoint interpretation awaits assessor
+confirmation; provider licensing unresolved. The sections below are the earlier
+2026-11-03 local audit and are historical (rows C, J, K and L are superseded).
+
 # Local delivery audit — 2026-11-03
 
-This is a working local implementation, not a production-readiness claim.
+Working local implementation as of that date.
 
 | Area | Verified status |
 |---|---|

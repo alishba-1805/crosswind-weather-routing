@@ -1,7 +1,11 @@
 # Free deployment preparation
 
-Source is published at https://github.com/alishba-1805/crosswind-weather-routing
-on main. No deployment has been performed. Do not add a card or select a
+Source: https://github.com/alishba-1805/crosswind-weather-routing (main).
+**Deployed:** frontend https://crosswind-web.onrender.com and backend
+https://crosswind-routing-api.onrender.com, both on Render; live-audited
+2026-11-04. Production `CORS_ORIGINS` is `https://crosswind-web.onrender.com`
+(no trailing slash) and frontend `VITE_API_URL` points at the backend origin. The
+steps below are the original preparation guide (Netlify was not used). Do not add a card or select a
 paid tier. Provider account requirements may change; stop if a signup requires
 payment. No database, background worker or paid resource is required.
 

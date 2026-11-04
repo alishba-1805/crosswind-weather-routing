@@ -1,11 +1,8 @@
 # Crosswind — Weather-Aware Truck Routing
 
-**Alishba Inam · Spotter full-stack assessment**
-
 Crosswind compares truck routes by weather exposure at predicted arrival times.
 The dark, map-first workspace places road geometry on the left and a compact
-comparison inspector on the right. Built independently in this repository with
-Codex development tools. No other student's project was accessed or reused.
+comparison inspector on the right.
 
 ![Actual Crosswind empty-state browser screenshot](docs/empty-desktop.png)
 
@@ -21,12 +18,37 @@ Codex development tools. No other student's project was accessed or reused.
 - Bounded corridor weather circles, cached 0–48h slider and explicit Unknown data.
 - Responsive planning panel, map and comparison; keyboard location selection.
 
-**Status:** published source, not yet production accepted. Credentials stay in
-ignored server-side environment files. Live HGV/geocoding acceptance and a corridor with three
-distinct alternatives remain unverified. Browser test routes are synthetic and
-clearly labeled; the application never silently substitutes fixtures for live data.
+**Status:** deployed and live-audited; see Production status below. Browser
+test routes in the automated suite are synthetic and clearly labeled; the
+application never silently substitutes fixtures for live data.
 Source: [alishba-1805/crosswind-weather-routing](https://github.com/alishba-1805/crosswind-weather-routing).
-No hosted app or Loom recording has been created.
+
+## Production status (audited 2026-11-04)
+
+- Frontend: https://crosswind-web.onrender.com (Render static site)
+- Backend: https://crosswind-routing-api.onrender.com (Render free web service; cold starts expected)
+- Source: https://github.com/alishba-1805/crosswind-weather-routing
+
+A live Playwright audit of the deployed pair confirmed: `/api/health` 200, CORS
+restricted to the frontend origin, real autocomplete, real ORS `driving-hgv`
+routing and Open-Meteo weather, working map/checkpoints/0-24-48 h slider, no
+horizontal overflow at desktop or 390 px width, no uncaught browser errors, no
+failed API requests and no secrets in the frontend bundle.
+
+**Live acceptance test:** Frederick, MD to Gaithersburg, MD returned three
+distinct routes of **24.9, 24.2 and 24.5 mi** (46, 50 and 50 min) with **100%
+weather coverage**. Backend suite: **36 passed**.
+
+Unverified or open:
+- 25/50-mile intermediate sampling on a corridor longer than 50 miles (the
+  24.9-mile test route yields only endpoint checkpoints at those spacings).
+- Live Severe/No Travel weather was not observed; those classes are covered by
+  deterministic tests only.
+- Rain/snow endpoints shared by two bands (rain 0.25, 0.50, 1.00; snow 1.0, 2.0,
+  3.0) use the higher severity class; assessor confirmation is pending.
+- Loom recording is **pending**; no link exists.
+- Provider licensing/eligibility (Open-Meteo non-commercial terms, HeiGIT/ORS
+  quotas, no software license assigned) is unresolved.
 
 ## Run locally (PowerShell)
 
@@ -115,7 +137,7 @@ Open-Meteo's free hosted service is non-commercial only. A hiring assessment's
 eligibility needs clarification before publication. No paid usage is authorized.
 See [verified provider notes](docs/PROVIDERS.md) and
 [free deployment instructions](docs/DEPLOYMENT.md). These include independent
-Render/Netlify configuration, exact CORS and real-provider acceptance steps.
+Render configuration, exact CORS and real-provider acceptance steps.
 
 Attribution: [HeiGIT / openrouteservice](https://api.heigit.org/),
 [Open-Meteo](https://open-meteo.com/) (CC BY 4.0),

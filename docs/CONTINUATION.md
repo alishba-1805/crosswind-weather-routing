@@ -1,7 +1,16 @@
 # Delivery continuation
 
-The local application and deterministic checks are implemented. External
-acceptance is not complete, and production readiness is not claimed.
+Deployed and live-audited on 2026-11-04: frontend https://crosswind-web.onrender.com,
+backend https://crosswind-routing-api.onrender.com. Backend suite 36 passed. Frederick, MD to
+Gaithersburg, MD returned 3 routes (24.9/24.2/24.5 mi) with 100% weather coverage.
+Not production-final: the items below remain open.
+
+Remaining work: (1) record the 5-10 minute Loom and add its real link (none exists);
+(2) verify 25/50-mile sampling on a corridor longer than 50 miles; (3) obtain
+assessor confirmation that rain/snow shared endpoints take the higher class;
+(4) resolve Open-Meteo/HeiGIT licensing and eligibility. Live Severe/No Travel
+weather has not been observed; tests cover it. The numbered steps below are the
+original local checklist, kept for reference.
 
 1. Put an independently obtained free HeiGIT key in the ignored `backend/.env`.
    Do not send credentials in chat or put them in frontend variables.
@@ -18,8 +27,3 @@ acceptance is not complete, and production readiness is not claimed.
 6. Run real-provider acceptance and browser checks on the deployed HTTPS origins.
    Capture a genuine live-results screenshot. Record the 5–10 minute Loom using
    LOOM.md and add real repository/app/video links to README.
-
-Local services used in this work: backend `127.0.0.1:8000`, frontend
-`127.0.0.1:5173`. No external repository or deployment is connected. Local commits
-use `Crosswind Development Tools <crosswind@localhost>` to avoid implying human
-authorship through this machine's unrelated default Git identity.
