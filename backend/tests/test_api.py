@@ -4,6 +4,8 @@ from unittest.mock import patch
 import httpx
 import pytest
 from rest_framework.test import APIClient
+from django.conf import settings
+from django.test import override_settings
 
 from crosswind.providers import ProviderError, forecasts, request
 
@@ -38,6 +40,77 @@ def test_health_and_validation(client):
         {"departure": "2026-01-01T00:00"},
     ):
         assert client.post("/api/analysis", payload() | change, format="json").status_code == 400
+
+
+def load_settings(monkeypatch, allowed, render):
+    import importlib
+
+    import crosswind.settings as module
+
+    for name, value in (("ALLOWED_HOSTS", allowed), ("RENDER_EXTERNAL_HOSTNAME", render)):
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
+    return importlib.reload(module)
+
+
+@pytest.fixture
+def reload_settings_after(monkeypatch):
+    yield
+    monkeypatch.undo()
+    import importlib
+
+    import crosswind.settings as module
+
+    importlib.reload(module)
+
+
+@pytest.mark.parametrize("method", ["get", "head"])
+def test_health_with_env_configured_render_host(client, monkeypatch, reload_settings_after, method):
+    configured = load_settings(
+        monkeypatch, " localhost, ,127.0.0.1 ", " crosswind-api.onrender.com "
+    )
+    monkeypatch.delenv("ORS_API_KEY", raising=False)
+    with (
+        override_settings(ALLOWED_HOSTS=configured.ALLOWED_HOSTS),
+        patch("crosswind.api.geocode", side_effect=AssertionError),
+        patch("crosswind.api.analyze", side_effect=AssertionError),
+        patch("httpx.Client.request", side_effect=AssertionError),
+    ):
+        response = getattr(client, method)("/api/health", HTTP_HOST="crosswind-api.onrender.com")
+        unknown = client.get("/api/health", HTTP_HOST="attacker.example")
+    assert configured.ALLOWED_HOSTS == ["localhost", "127.0.0.1", "crosswind-api.onrender.com"]
+    assert "*" not in configured.ALLOWED_HOSTS
+    assert response.status_code == 200
+    assert unknown.status_code == 400
+    if method == "get":
+        assert response.json() == {"status": "ok", "service": "crosswind"}
+    else:
+        assert response.content == b""
+
+
+def test_active_settings_reject_unknown_host(client):
+    assert "*" not in settings.ALLOWED_HOSTS
+    assert client.get("/api/health", HTTP_HOST="attacker.example").status_code == 400
+
+
+def test_defaults_keep_local_hosts(monkeypatch, reload_settings_after):
+    configured = load_settings(monkeypatch, "", None)
+    assert configured.ALLOWED_HOSTS == ["localhost", "127.0.0.1", "testserver"]
+
+
+def test_render_and_explicit_hosts_are_normalized():
+    from crosswind.settings import parse_allowed_hosts
+
+    assert parse_allowed_hosts(" app.example, api.example ", " service.onrender.com ") == [
+        "app.example",
+        "api.example",
+        "service.onrender.com",
+    ]
+    assert parse_allowed_hosts(" app.example, app.example ", None) == ["app.example"]
+    with pytest.raises(RuntimeError, match="hostnames only"):
+        parse_allowed_hosts("https://api.example", None)
 
 
 def test_credential_error(client):

@@ -49,7 +49,7 @@ def failure(exc):
     return Response({"error": {"code": exc.code, "message": exc.message}}, status=exc.status)
 
 
-@api_view(["GET"])
+@api_view(["GET", "HEAD"])
 def health(request):
     return Response({"status": "ok", "service": "crosswind"})
 

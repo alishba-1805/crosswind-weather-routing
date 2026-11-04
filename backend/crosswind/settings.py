@@ -4,11 +4,26 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
+
+def parse_allowed_hosts(configured: str | None, render_hostname: str | None) -> list[str]:
+    """Combine exact hostnames from deployment configuration; reject URL input."""
+    hosts = [host.strip().rstrip(".") for host in (configured or "").split(",")]
+    if render_hostname and render_hostname.strip():
+        hosts.append(render_hostname.strip().rstrip("."))
+    hosts = [host for host in hosts if host]
+    if any("://" in host or "/" in host for host in hosts):
+        raise RuntimeError("ALLOWED_HOSTS and RENDER_EXTERNAL_HOSTNAME must contain hostnames only")
+    return list(dict.fromkeys(hosts)) or ["localhost", "127.0.0.1", "testserver"]
+
+
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "local-development-only-crosswind")
 if not DEBUG and SECRET_KEY == "local-development-only-crosswind":
     raise RuntimeError("Set DJANGO_SECRET_KEY for production")
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver").split(",")
+ALLOWED_HOSTS = parse_allowed_hosts(
+    os.getenv("ALLOWED_HOSTS"), os.getenv("RENDER_EXTERNAL_HOSTNAME")
+)
 ROOT_URLCONF = "crosswind.api"
 INSTALLED_APPS = ["rest_framework", "corsheaders"]
 MIDDLEWARE = [
