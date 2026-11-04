@@ -60,8 +60,33 @@ test("empty state and invalid selection feedback", async () => {
     screen.getByRole("button", { name: /Compare routes/ }).closest("form")!,
   );
   await waitFor(() =>
-    expect(screen.getByRole("alert")).toHaveTextContent("Select origin"),
+    expect(screen.getByRole("alert")).toHaveTextContent("Fix the highlighted"),
   );
+});
+
+test("empty and invalid submissions show accessible inline field errors", async () => {
+  const user = userEvent.setup();
+  const fetchMock = vi.fn();
+  vi.stubGlobal("fetch", fetchMock);
+  render(<App />);
+  await user.click(screen.getByRole("button", { name: /Compare routes/ }));
+  const origin = screen.getByRole("combobox", { name: "Origin" });
+  expect(origin).toHaveAttribute("aria-invalid", "true");
+  expect(origin).toHaveAccessibleDescription(/Choose an origin/);
+  expect(
+    screen.getByRole("combobox", { name: "Destination" }),
+  ).toHaveAccessibleDescription(/Choose a destination/);
+  expect(screen.getByRole("alert")).toHaveTextContent("Fix the highlighted");
+  const load = screen.getByLabelText(/Load/);
+  await user.clear(load);
+  await user.type(load, "200000");
+  await user.click(screen.getByRole("button", { name: /Compare routes/ }));
+  expect(load).toHaveAccessibleDescription(/0 to 150,000/);
+  const when = screen.getByLabelText(/Departure/);
+  fireEvent.change(when, { target: { value: "" } });
+  await user.click(screen.getByRole("button", { name: /Compare routes/ }));
+  expect(when).toHaveAccessibleDescription(/Enter a departure/);
+  expect(fetchMock).not.toHaveBeenCalled();
 });
 
 test("loading state ends with a structured request error", async () => {

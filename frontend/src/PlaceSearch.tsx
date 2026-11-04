@@ -4,8 +4,10 @@ import s from "./App.module.css";
 export function PlaceSearch({
   label,
   onSelect,
+  invalid,
 }: {
   label: string;
+  invalid?: string;
   onSelect: (p: Place | null) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -54,7 +56,8 @@ export function PlaceSearch({
           aria-controls={id + "-list"}
           aria-activedescendant={active >= 0 ? id + "-" + active : undefined}
           autoComplete="off"
-          required
+          aria-invalid={invalid ? true : undefined}
+          aria-describedby={invalid ? id + "-error" : undefined}
           value={query}
           placeholder={
             label === "Origin"
@@ -105,6 +108,11 @@ export function PlaceSearch({
           </li>
         ))}
       </ul>
+      {invalid && (
+        <small id={id + "-error"} className={s.fieldError}>
+          {invalid}
+        </small>
+      )}
       {error && <small role="status">{error}</small>}
     </div>
   );

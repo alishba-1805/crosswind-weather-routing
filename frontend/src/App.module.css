@@ -633,3 +633,11 @@
     animation: none;
   }
 }
+
+.fieldError {
+  display: block;
+  margin-top: 4px;
+  color: #f3a07a;
+  font-size: 11px;
+  line-height: 1.4;
+}

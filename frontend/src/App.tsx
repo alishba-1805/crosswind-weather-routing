@@ -20,14 +20,35 @@ export default function App() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string>>({});
   const route = data?.routes.find((r) => r.id === selected);
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!origin || !destination) {
-      setError("Select origin and destination from the location suggestions.");
+    const form = new FormData(e.currentTarget);
+    const problems: Record<string, string> = {};
+    if (!origin) problems.origin = "Choose an origin from the suggestions.";
+    if (!destination)
+      problems.destination = "Choose a destination from the suggestions.";
+    const when = new Date(String(form.get("departure"))).getTime();
+    if (!form.get("departure") || Number.isNaN(when))
+      problems.departure = "Enter a departure date and time.";
+    else if (when < Date.now() - 300000 || when > Date.now() + 5 * 86400000)
+      problems.departure =
+        "Departure must be from now through five days ahead.";
+    const loadText = String(form.get("load")).trim();
+    const loadValue = Number(loadText);
+    if (
+      !loadText ||
+      !Number.isFinite(loadValue) ||
+      loadValue < 0 ||
+      loadValue > 150000
+    )
+      problems.load = "Enter a load from 0 to 150,000 lb.";
+    setFields(problems);
+    if (!origin || !destination || Object.keys(problems).length) {
+      setError("Fix the highlighted fields to compare routes.");
       return;
     }
-    const form = new FormData(e.currentTarget);
     setLoading(true);
     setError("");
     setData(null);
@@ -39,8 +60,8 @@ export default function App() {
         body: JSON.stringify({
           origin: origin.position,
           destination: destination.position,
-          departure: new Date(String(form.get("departure"))).toISOString(),
-          load: Number(form.get("load")),
+          departure: new Date(when).toISOString(),
+          load: loadValue,
           spacing: Number(form.get("spacing")),
         }),
       });
@@ -70,9 +91,6 @@ export default function App() {
           <span className={s.mark}>↗</span>CROSSWIND
           <span className={s.edition}>ROUTE INTELLIGENCE</span>
         </a>
-        <span className={s.owner}>
-          Alishba Inam <span>/ Independent assessment</span>
-        </span>
       </header>
       <main>
         <details open className={s.planner}>
@@ -80,17 +98,34 @@ export default function App() {
             Trip planner{" "}
             <span>US truck routes · short corridors up to 100 km</span>
           </summary>
-          <form onSubmit={submit}>
-            <PlaceSearch label="Origin" onSelect={setOrigin} />
-            <PlaceSearch label="Destination" onSelect={setDestination} />
+          <form onSubmit={submit} noValidate>
+            <PlaceSearch
+              label="Origin"
+              invalid={fields.origin}
+              onSelect={setOrigin}
+            />
+            <PlaceSearch
+              label="Destination"
+              invalid={fields.destination}
+              onSelect={setDestination}
+            />
             <label>
               Departure · local time
               <input
                 name="departure"
                 type="datetime-local"
                 required
+                aria-invalid={fields.departure ? true : undefined}
+                aria-describedby={
+                  fields.departure ? "departure-error" : undefined
+                }
                 defaultValue={localDate}
               />
+              {fields.departure && (
+                <small id="departure-error" className={s.fieldError}>
+                  {fields.departure}
+                </small>
+              )}
             </label>
             <label>
               Load · lb
@@ -100,8 +135,15 @@ export default function App() {
                 min="0"
                 max="150000"
                 required
+                aria-invalid={fields.load ? true : undefined}
+                aria-describedby={fields.load ? "load-error" : undefined}
                 defaultValue="30000"
               />
+              {fields.load && (
+                <small id="load-error" className={s.fieldError}>
+                  {fields.load}
+                </small>
+              )}
             </label>
             <label>
               Sampling
@@ -213,10 +255,6 @@ export default function App() {
                     We check wind, rain and snow at estimated checkpoint
                     arrivals, with your cargo load in view.
                   </p>
-                  <small>
-                    Live routing needs a server-side ORS key. No synthetic
-                    results are shown here.
-                  </small>
                 </div>
               ) : (
                 <>
@@ -368,7 +406,7 @@ export default function App() {
         </div>
       </main>
       <footer>
-        Crosswind / Alishba Inam{" "}
+        Crosswind{" "}
         <span>Routing © HeiGIT / ORS · Weather © Open-Meteo (CC BY 4.0)</span>
       </footer>
     </div>
